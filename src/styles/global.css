@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme {
+  --font-nunito: 'Nunito', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-caveat: 'Caveat', cursive;
+
+  --color-space-900: #070b1a;
+  --color-space-800: #0d1333;
+  --color-space-700: #141d4d;
+  --color-primary: #3B82F6;
+  --color-primary-light: #60a5fa;
+  --color-accent: #F59E0B;
+  --color-accent-light: #fbbf24;
+  --color-secondary: #10B981;
+  --color-coral: #ef7c6e;
+}
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: var(--font-inter);
+    background: var(--color-space-900);
+    color: white;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+/* Star field animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+}
+
+@keyframes float-drift {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); }
+  25% { transform: translateY(-8px) translateX(5px) rotate(2deg); }
+  50% { transform: translateY(-15px) translateX(-3px) rotate(-1deg); }
+  75% { transform: translateY(-8px) translateX(8px) rotate(1deg); }
+  100% { transform: translateY(0) translateX(0) rotate(0deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.7)); }
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(30px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.03); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.02); }
+  60% { transform: scale(1); }
+}
+
+@keyframes shooting-star {
+  0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 0; }
+  5% { opacity: 1; }
+  15% { opacity: 1; }
+  30% { transform: translateX(300px) translateY(300px) rotate(-45deg); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes plane-fly {
+  0% { transform: translateX(-50px) translateY(0); }
+  50% { transform: translateX(0px) translateY(-15px); }
+  100% { transform: translateX(50px) translateY(0); }
+}
