@@ -5,10 +5,12 @@ import StatsCounter from './StatsCounter';
 import MemoriesPanel from './MemoriesPanel';
 
 function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState(false);
+  // Initialize with actual window width (client:only guarantees window exists)
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < breakpoint : false
+  );
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < breakpoint);
-    check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, [breakpoint]);
@@ -24,6 +26,12 @@ export default function MapExperience({ cities, stats }: MapExperienceProps) {
   const [selectedCityId, setSelectedCityId] = useState(cities[0]?.id || '');
   const selectedCity = cities.find(c => c.id === selectedCityId) || cities[0];
   const isMobile = useIsMobile();
+
+  // Hide SSR fallback once this component mounts
+  useEffect(() => {
+    const fallback = document.getElementById('ssr-fallback');
+    if (fallback) fallback.style.display = 'none';
+  }, []);
 
   if (isMobile) {
     return (
