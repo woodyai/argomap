@@ -1,0 +1,22 @@
+name: Kyoto
+nameZh: 京都
+country: Japan
+countryZh: 日本
+lat: 35.0116
+lng: 135.7681
+markerColor: "#EF4444"
+visitDate: "2018-08"
+diary:
+  en: "Umm... I don't really remember (I was only one, can you blame me?!)"
+  zh: "呃，好像不记得了（我只有一岁忘记了吗！）"
+mood: ["👶", "😶‍🌫️", "🫠", "❓"]
+topPicks:
+  - name: "Kyoto Temples"
+    icon: "⛩️"
+photos:
+  - color: "#c9a87c"
+    label: "Temple"
+  - color: "#8ba57e"
+    label: "Garden"
+  - color: "#d4b896"
+    label: "Torii"

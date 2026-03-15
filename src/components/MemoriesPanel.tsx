@@ -1,40 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const memoriesData = {
-  city: 'PARIS',
-  icon: '🗼',
-  diary: {
-    title: 'Diary (日记)',
-    emoji: '📔',
-    contentEn: 'The crêpes were amazing!',
-    contentZh: '可丽饼太好吃了！',
-  },
-  photos: {
-    title: 'Photo Gallery (照片墙)',
-    emoji: '🌅',
-    images: [
-      { id: 1, color: '#e8d5b7', label: 'Crepes' },
-      { id: 2, color: '#7eb8c9', label: 'Eiffel' },
-      { id: 3, color: '#c9a87c', label: 'Pastry' },
-      { id: 4, color: '#6b9e7a', label: 'Park' },
-      { id: 5, color: '#8ba5c4', label: 'Family' },
-      { id: 6, color: '#d4a574', label: 'Food' },
-    ],
-  },
-  mood: {
-    title: 'Mood Tracker (情绪记录)',
-    emoji: '🤩',
-    moods: ['😀', '🤩', '😋', '🤔'],
-  },
-  topPicks: {
-    title: 'Top Picks (热门推荐)',
-    emoji: '⭐',
-    picks: [
-      { name: 'Best Ice Cream', icon: '🍦' },
-      { name: 'Coolest Park', icon: '🌳' },
-    ],
-  },
-};
+import type { CityData } from '../types';
 
 function SectionCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
@@ -53,7 +18,11 @@ function SectionCard({ children, style }: { children: React.ReactNode; style?: R
   );
 }
 
-export default function MemoriesPanel() {
+interface MemoriesPanelProps {
+  city: CityData;
+}
+
+export default function MemoriesPanel({ city }: MemoriesPanelProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -94,8 +63,17 @@ export default function MemoriesPanel() {
             color: '#ffffff',
           }}
         >
-          MEMORIES: {memoriesData.city} {memoriesData.icon}
+          MEMORIES: {city.name.toUpperCase()}
         </h2>
+        <p style={{
+          fontFamily: "'Nunito', sans-serif",
+          fontSize: '12px',
+          fontWeight: 400,
+          color: 'rgba(255,255,255,0.4)',
+          margin: '4px 0 0 0',
+        }}>
+          {city.nameZh} · {city.countryZh} · {city.visitDate}
+        </p>
       </div>
 
       {/* Diary */}
@@ -109,7 +87,7 @@ export default function MemoriesPanel() {
             color: '#ffffff',
           }}
         >
-          {memoriesData.diary.emoji} {memoriesData.diary.title}
+          📔 Diary (日记)
         </h3>
         <p
           style={{
@@ -120,9 +98,9 @@ export default function MemoriesPanel() {
             lineHeight: 1.5,
           }}
         >
-          {memoriesData.diary.contentEn}
+          {city.diary.en}
           <br />
-          {memoriesData.diary.contentZh}
+          {city.diary.zh}
         </p>
       </SectionCard>
 
@@ -137,7 +115,7 @@ export default function MemoriesPanel() {
             color: '#ffffff',
           }}
         >
-          {memoriesData.photos.emoji} {memoriesData.photos.title}
+          🌅 Photo Gallery (照片墙)
         </h3>
         <div
           style={{
@@ -146,13 +124,13 @@ export default function MemoriesPanel() {
             gap: '6px',
           }}
         >
-          {memoriesData.photos.images.map((img) => (
+          {city.photos.map((photo, i) => (
             <div
-              key={img.id}
+              key={i}
               style={{
                 aspectRatio: '1',
                 borderRadius: '10px',
-                background: `linear-gradient(135deg, ${img.color}, ${img.color}dd)`,
+                background: `linear-gradient(135deg, ${photo.color}, ${photo.color}dd)`,
                 cursor: 'pointer',
                 transition: 'transform 0.2s ease',
                 overflow: 'hidden',
@@ -165,7 +143,6 @@ export default function MemoriesPanel() {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {/* Placeholder pattern */}
               <div
                 style={{
                   position: 'absolute',
@@ -178,7 +155,7 @@ export default function MemoriesPanel() {
                   fontFamily: "'Nunito', sans-serif",
                 }}
               >
-                {img.label}
+                {photo.label}
               </div>
             </div>
           ))}
@@ -196,10 +173,10 @@ export default function MemoriesPanel() {
             color: '#ffffff',
           }}
         >
-          {memoriesData.mood.emoji} {memoriesData.mood.title}
+          🤩 Mood Tracker (情绪记录)
         </h3>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
-          {memoriesData.mood.moods.map((mood, i) => (
+          {city.mood.map((mood, i) => (
             <span
               key={i}
               style={{
@@ -232,10 +209,10 @@ export default function MemoriesPanel() {
             color: '#ffffff',
           }}
         >
-          {memoriesData.topPicks.emoji} {memoriesData.topPicks.title}
+          ⭐ Top Picks (热门推荐)
         </h3>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start' }}>
-          {memoriesData.topPicks.picks.map((pick) => (
+          {city.topPicks.map((pick) => (
             <div
               key={pick.name}
               style={{

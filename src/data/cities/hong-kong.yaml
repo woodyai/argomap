@@ -1,0 +1,24 @@
+name: Hong Kong
+nameZh: 香港
+country: China
+countryZh: 中国
+lat: 22.3193
+lng: 114.1694
+markerColor: "#EF4444"
+visitDate: "2025-07"
+diary:
+  en: "Disneyland was so much fun!"
+  zh: "迪士尼真好玩儿啊！"
+mood: ["🎢", "🤩", "😆", "✨"]
+topPicks:
+  - name: "HK Disneyland"
+    icon: "🏰"
+photos:
+  - color: "#f0c8d8"
+    label: "Castle"
+  - color: "#a8d0e6"
+    label: "Parade"
+  - color: "#f8e8a0"
+    label: "Fireworks"
+  - color: "#c8e6c0"
+    label: "Rides"

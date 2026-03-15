@@ -1,23 +1,8 @@
-import { useRef, useMemo, Suspense } from 'react';
+import { useRef, useMemo, Suspense, useCallback } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
-
-// City marker data
-const cityMarkers = [
-  { id: 'beijing', name: 'Beijing', lat: 39.9042, lng: 116.4074, color: '#F59E0B' },
-  { id: 'shanghai', name: 'Shanghai', lat: 31.2304, lng: 121.4737, color: '#F59E0B' },
-  { id: 'hong-kong', name: 'Hong Kong', lat: 22.3193, lng: 114.1694, color: '#F59E0B' },
-  { id: 'macau', name: 'Macau', lat: 22.1987, lng: 113.5439, color: '#F59E0B' },
-  { id: 'osaka', name: 'Osaka', lat: 34.6937, lng: 135.5023, color: '#EF4444' },
-  { id: 'kyoto', name: 'Kyoto', lat: 35.0116, lng: 135.7681, color: '#EF4444' },
-  { id: 'paris', name: 'Paris', lat: 48.8566, lng: 2.3522, color: '#EF4444' },
-  { id: 'london', name: 'London', lat: 51.5074, lng: -0.1278, color: '#EF4444' },
-  { id: 'new-york', name: 'New York', lat: 40.7128, lng: -74.0060, color: '#EF4444' },
-  { id: 'sydney', name: 'Sydney', lat: -33.8688, lng: 151.2093, color: '#F59E0B' },
-  { id: 'dubai', name: 'Dubai', lat: 25.2048, lng: 55.2708, color: '#F59E0B' },
-  { id: 'rome', name: 'Rome', lat: 41.9028, lng: 12.4964, color: '#EF4444' },
-];
+import type { CityData } from '../types';
 
 const RADIUS = 1.8;
 
@@ -31,8 +16,9 @@ function latLngToVec3(lat: number, lng: number, radius: number): THREE.Vector3 {
   );
 }
 
-function CityMarker({ lat, lng, color, radius }: {
+function CityMarker({ lat, lng, color, radius, isSelected, onClick }: {
   lat: number; lng: number; color: string; radius: number;
+  isSelected?: boolean; onClick?: () => void;
 }) {
   const ref = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -40,25 +26,38 @@ function CityMarker({ lat, lng, color, radius }: {
 
   useFrame(({ clock }) => {
     if (ref.current) {
-      const scale = 1 + Math.sin(clock.elapsedTime * 3 + lat) * 0.3;
+      const base = isSelected ? 1.6 : 1;
+      const scale = base + Math.sin(clock.elapsedTime * 3 + lat) * 0.3;
       ref.current.scale.setScalar(scale);
     }
     if (glowRef.current) {
-      const glowScale = 1.5 + Math.sin(clock.elapsedTime * 2 + lng) * 0.5;
+      const glowBase = isSelected ? 2.0 : 1.5;
+      const glowScale = glowBase + Math.sin(clock.elapsedTime * 2 + lng) * 0.5;
       glowRef.current.scale.setScalar(glowScale);
-      (glowRef.current.material as THREE.MeshBasicMaterial).opacity = 0.25 + Math.sin(clock.elapsedTime * 2) * 0.1;
+      const opBase = isSelected ? 0.4 : 0.25;
+      (glowRef.current.material as THREE.MeshBasicMaterial).opacity = opBase + Math.sin(clock.elapsedTime * 2) * 0.1;
     }
   });
+
+  const handleClick = useCallback((e: any) => {
+    e.stopPropagation();
+    onClick?.();
+  }, [onClick]);
 
   return (
     <group position={pos}>
       <mesh ref={glowRef}>
-        <sphereGeometry args={[0.06, 16, 16]} />
-        <meshBasicMaterial color={color} transparent opacity={0.2} />
+        <sphereGeometry args={[isSelected ? 0.08 : 0.06, 16, 16]} />
+        <meshBasicMaterial color={isSelected ? '#ffffff' : color} transparent opacity={0.2} />
       </mesh>
-      <mesh ref={ref}>
-        <sphereGeometry args={[0.028, 16, 16]} />
-        <meshBasicMaterial color={color} />
+      <mesh
+        ref={ref}
+        onClick={handleClick}
+        onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+        onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+      >
+        <sphereGeometry args={[isSelected ? 0.038 : 0.028, 16, 16]} />
+        <meshBasicMaterial color={isSelected ? '#ffffff' : color} />
       </mesh>
     </group>
   );
@@ -82,7 +81,13 @@ function EarthSphere() {
   );
 }
 
-function Earth() {
+interface EarthProps {
+  cities: CityData[];
+  selectedCityId: string;
+  onCityClick: (id: string) => void;
+}
+
+function Earth({ cities, selectedCityId, onCityClick }: EarthProps) {
   const earthRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
   const atmosphereRef2 = useRef<THREE.Mesh>(null);
@@ -129,20 +134,28 @@ function Earth() {
       </Suspense>
 
       {/* City markers */}
-      {cityMarkers.map((city) => (
+      {cities.map((city) => (
         <CityMarker
           key={city.id}
           lat={city.lat}
           lng={city.lng}
-          color={city.color}
+          color={city.markerColor}
           radius={RADIUS + 0.02}
+          isSelected={city.id === selectedCityId}
+          onClick={() => onCityClick(city.id)}
         />
       ))}
     </group>
   );
 }
 
-export default function Globe() {
+interface GlobeProps {
+  cities: CityData[];
+  selectedCityId: string;
+  onCityClick: (id: string) => void;
+}
+
+export default function Globe({ cities, selectedCityId, onCityClick }: GlobeProps) {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <Canvas
@@ -154,7 +167,7 @@ export default function Globe() {
           gl.outputColorSpace = THREE.LinearSRGBColorSpace;
         }}
       >
-        <Earth />
+        <Earth cities={cities} selectedCityId={selectedCityId} onCityClick={onCityClick} />
 
         <OrbitControls
           enableZoom={true}

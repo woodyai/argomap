@@ -1,0 +1,30 @@
+name: Beijing
+nameZh: 北京
+country: China
+countryZh: 中国
+lat: 39.9042
+lng: 116.4074
+markerColor: "#F59E0B"
+visitDate: "Home 🏠"
+diary:
+  en: "The city is so vibrant! Sanlitun is amazing everywhere you go!"
+  zh: "城市很繁华！三里屯哪儿哪儿都好！"
+mood: ["😄", "🥰", "😊", "🤗"]
+topPicks:
+  - name: "Sanlitun Taikoo Li"
+    icon: "🛍️"
+  - name: "Peking Duck"
+    icon: "🦆"
+photos:
+  - color: "#c4956a"
+    label: "Sanlitun"
+  - color: "#8b6f4e"
+    label: "Peking Duck"
+  - color: "#d4a574"
+    label: "Sunset"
+  - color: "#a0c4a8"
+    label: "Park"
+  - color: "#c9b896"
+    label: "Street"
+  - color: "#7ea8c9"
+    label: "Sky"

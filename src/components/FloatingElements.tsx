@@ -95,34 +95,32 @@ export default function FloatingElements() {
           top: '45%',
           left: '5%',
           animation: 'plane-fly 15s ease-in-out infinite',
-          opacity: 0.6,
+          opacity: 0.55,
         }}
       >
-        <svg width="60" height="40" viewBox="0 0 60 40" fill="none">
-          {/* Body */}
-          <ellipse cx="30" cy="20" rx="22" ry="4" fill="white" opacity="0.8" />
-          {/* Wing */}
-          <path d="M22 20 L10 10 L35 18 Z" fill="white" opacity="0.6" />
-          <path d="M22 20 L10 30 L35 22 Z" fill="white" opacity="0.5" />
-          {/* Tail */}
-          <path d="M48 20 L56 12 L52 20 Z" fill="white" opacity="0.6" />
-          <path d="M48 20 L56 28 L52 20 Z" fill="white" opacity="0.5" />
-          {/* Trail */}
-          <line x1="52" y1="20" x2="65" y2="20" stroke="white" strokeWidth="1" opacity="0.3" strokeDasharray="4 3" />
+        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
+          {/* Fuselage */}
+          <ellipse cx="14" cy="9" rx="13" ry="2.2" fill="white" opacity="0.7" />
+          {/* Wing top */}
+          <path d="M12 7 L8 2 L18 7 Z" fill="white" opacity="0.55" />
+          {/* Wing bottom */}
+          <path d="M12 11 L8 16 L18 11 Z" fill="white" opacity="0.45" />
+          {/* Tail fin */}
+          <path d="M26 7 L30 3 L30 7 Z" fill="white" opacity="0.5" />
         </svg>
-        {/* Dashed trail path */}
+        {/* Contrail */}
         <svg
-          width="100"
-          height="40"
-          viewBox="0 0 100 40"
-          style={{ position: 'absolute', right: '-80px', top: '8px' }}
+          width="60"
+          height="10"
+          viewBox="0 0 60 10"
+          style={{ position: 'absolute', right: '-50px', top: '6px' }}
           fill="none"
         >
           <path
-            d="M0 20 Q25 10 50 20 T100 20"
-            stroke="rgba(255,255,255,0.15)"
-            strokeWidth="1"
-            strokeDasharray="4 6"
+            d="M0 5 Q15 3 30 5 T60 5"
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth="0.8"
+            strokeDasharray="3 5"
             fill="none"
           />
         </svg>
