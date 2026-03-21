@@ -60,17 +60,17 @@ const stats = {
     <style>
       @keyframes spin { to { transform: rotate(360deg); } }
     </style>
-    <script is:inline>
-      const fallback = document.getElementById('ssr-fallback');
-      const spinner = document.getElementById('ssr-fallback-spinner');
-      const message = document.getElementById('ssr-fallback-message');
-      const refreshButton = document.getElementById('ssr-fallback-refresh');
+    <script is:inline define:vars={{ loadingSlowText: copy.loadingSlow }}>
+      var fallback = document.getElementById('ssr-fallback');
+      var spinner = document.getElementById('ssr-fallback-spinner');
+      var message = document.getElementById('ssr-fallback-message');
+      var refreshButton = document.getElementById('ssr-fallback-refresh');
 
       if (refreshButton) {
-        refreshButton.addEventListener('click', () => window.location.reload());
+        refreshButton.addEventListener('click', function() { window.location.reload(); });
       }
 
-      window.setTimeout(() => {
+      window.setTimeout(function() {
         if (!fallback || fallback.style.display === 'none') {
           return;
         }
@@ -79,7 +79,7 @@ const stats = {
           spinner.style.display = 'none';
         }
         if (message) {
-          message.textContent = {JSON.stringify(copy.loadingSlow)};
+          message.textContent = loadingSlowText;
         }
         if (refreshButton) {
           refreshButton.style.display = 'inline-flex';
