@@ -22,9 +22,10 @@ function SectionCard({ children, style }: { children: React.ReactNode; style?: R
 interface MemoriesPanelProps {
   city: CityData;
   lang: Lang;
+  fullWidth?: boolean;
 }
 
-export default function MemoriesPanel({ city, lang }: MemoriesPanelProps) {
+export default function MemoriesPanel({ city, lang, fullWidth }: MemoriesPanelProps) {
   const [isVisible, setIsVisible] = useState(false);
   const copy = strings[lang];
   const cityName = lang === 'zh' ? city.nameZh : city.name;
@@ -40,7 +41,7 @@ export default function MemoriesPanel({ city, lang }: MemoriesPanelProps) {
     <div
       className="hide-scrollbar"
       style={{
-        width: '300px',
+        width: fullWidth ? '100%' : '300px',
         maxHeight: 'calc(100vh - 120px)',
         overflowY: 'auto',
         overflowX: 'hidden',

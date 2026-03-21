@@ -274,7 +274,14 @@ export default function Globe({ cities, selectedCityId, onCityClick }: GlobeProp
   }
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+      borderRadius: '16px',
+      WebkitMaskImage: 'radial-gradient(circle, black 55%, transparent 75%)',
+      maskImage: 'radial-gradient(circle, black 55%, transparent 75%)',
+    }}>
       <Canvas
         camera={{ position: [0, 0.2, 5.2], fov: 45 }}
         gl={{ alpha: true, antialias: true }}

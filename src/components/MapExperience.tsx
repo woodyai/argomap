@@ -139,8 +139,8 @@ export default function MapExperience({ cities, stats, lang = 'en' }: MapExperie
         </div>
 
         {/* Memories Panel - inline below globe */}
-        <div style={{ width: '100%', maxWidth: '360px', padding: '0 16px', marginTop: '8px' }}>
-          {selectedCity && <MemoriesPanel city={selectedCity} lang={lang} />}
+        <div style={{ width: '100%', padding: '0 16px', marginTop: '8px' }}>
+          {selectedCity && <MemoriesPanel city={selectedCity} lang={lang} fullWidth />}
         </div>
       </div>
     );
