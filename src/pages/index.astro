@@ -42,14 +42,47 @@ const stats = {
         A journey of growth and exploration
       </p>
       <!-- Loading spinner -->
-      <div style="margin-top: 32px;">
+      <div id="ssr-fallback-spinner" style="margin-top: 32px;">
         <div style="width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.1); border-top-color: rgba(59,130,246,0.6); border-radius: 50%; animation: spin 1s linear infinite;"></div>
       </div>
-      <p style="font-family: 'Nunito', sans-serif; font-size: 13px; color: rgba(255,255,255,0.3); margin: 0;">Loading globe...</p>
+      <p id="ssr-fallback-message" style="font-family: 'Nunito', sans-serif; font-size: 13px; color: rgba(255,255,255,0.3); margin: 0;">Loading globe...</p>
+      <button
+        id="ssr-fallback-refresh"
+        type="button"
+        style="display: none; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: #ffffff; padding: 10px 18px; border-radius: 999px; font-family: 'Inter', sans-serif; font-size: 13px; cursor: pointer;"
+      >
+        刷新页面
+      </button>
     </div>
     <style>
       @keyframes spin { to { transform: rotate(360deg); } }
     </style>
+    <script is:inline>
+      const fallback = document.getElementById('ssr-fallback');
+      const spinner = document.getElementById('ssr-fallback-spinner');
+      const message = document.getElementById('ssr-fallback-message');
+      const refreshButton = document.getElementById('ssr-fallback-refresh');
+
+      if (refreshButton) {
+        refreshButton.addEventListener('click', () => window.location.reload());
+      }
+
+      window.setTimeout(() => {
+        if (!fallback || fallback.style.display === 'none') {
+          return;
+        }
+
+        if (spinner) {
+          spinner.style.display = 'none';
+        }
+        if (message) {
+          message.textContent = '加载较慢，请稍候或刷新重试。';
+        }
+        if (refreshButton) {
+          refreshButton.style.display = 'inline-flex';
+        }
+      }, 15000);
+    </script>
 
     <!-- Main Content — client:only renders nothing server-side, replaces fallback once loaded -->
     <MapExperience client:only="react" cities={cities} stats={stats} />

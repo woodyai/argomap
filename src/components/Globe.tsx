@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense, useCallback } from 'react';
+import { useRef, useMemo, Suspense, useCallback, useEffect, useState } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
@@ -14,6 +14,30 @@ function latLngToVec3(lat: number, lng: number, radius: number): THREE.Vector3 {
     radius * Math.cos(phi),
     radius * Math.sin(phi) * Math.sin(theta),
   );
+}
+
+function latLngToStaticPosition(lat: number, lng: number) {
+  return {
+    left: `${((lng + 180) / 360) * 100}%`,
+    top: `${((90 - lat) / 180) * 100}%`,
+  };
+}
+
+function isWebGLAvailable(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch {
+    return false;
+  }
+}
+
+function isLikelyMobileDevice(): boolean {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
+
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
 function CityMarker({ lat, lng, color, radius, isSelected, onClick }: {
@@ -64,7 +88,7 @@ function CityMarker({ lat, lng, color, radius, isSelected, onClick }: {
 }
 
 /** Loads texture via useLoader (Suspense) — texture guaranteed available before render */
-function EarthSphere() {
+function EarthSphere({ isMobile }: { isMobile: boolean }) {
   const texture = useLoader(THREE.TextureLoader, '/textures/earth_day.jpg');
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -76,7 +100,7 @@ function EarthSphere() {
 
   return (
     <mesh ref={meshRef} material={material}>
-      <sphereGeometry args={[RADIUS, 64, 64]} />
+      <sphereGeometry args={[RADIUS, isMobile ? 32 : 64, isMobile ? 32 : 64]} />
     </mesh>
   );
 }
@@ -85,12 +109,14 @@ interface EarthProps {
   cities: CityData[];
   selectedCityId: string;
   onCityClick: (id: string) => void;
+  isMobile: boolean;
 }
 
-function Earth({ cities, selectedCityId, onCityClick }: EarthProps) {
+function Earth({ cities, selectedCityId, onCityClick, isMobile }: EarthProps) {
   const earthRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
   const atmosphereRef2 = useRef<THREE.Mesh>(null);
+  const segments = isMobile ? 32 : 64;
 
   useFrame(({ clock }) => {
     if (earthRef.current) {
@@ -114,13 +140,13 @@ function Earth({ cities, selectedCityId, onCityClick }: EarthProps) {
     <group ref={earthRef}>
       {/* Outer atmosphere glow */}
       <mesh ref={atmosphereRef2}>
-        <sphereGeometry args={[RADIUS * 1.15, 64, 64]} />
+        <sphereGeometry args={[RADIUS * 1.15, segments, segments]} />
         <meshBasicMaterial color="#3b82f6" transparent opacity={0.06} side={THREE.BackSide} />
       </mesh>
 
       {/* Inner atmosphere glow */}
       <mesh ref={atmosphereRef}>
-        <sphereGeometry args={[RADIUS * 1.06, 64, 64]} />
+        <sphereGeometry args={[RADIUS * 1.06, segments, segments]} />
         <meshBasicMaterial color="#60a5fa" transparent opacity={0.15} side={THREE.BackSide} />
       </mesh>
 
@@ -130,7 +156,7 @@ function Earth({ cities, selectedCityId, onCityClick }: EarthProps) {
           <meshBasicMaterial color="#1a5a9a" />
         </Sphere>
       }>
-        <EarthSphere />
+        <EarthSphere isMobile={isMobile} />
       </Suspense>
 
       {/* City markers */}
@@ -149,6 +175,64 @@ function Earth({ cities, selectedCityId, onCityClick }: EarthProps) {
   );
 }
 
+function StaticGlobeFallback({ cities, selectedCityId, onCityClick }: GlobeProps) {
+  return (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <div style={{ position: 'relative', width: '88%', height: '88%' }}>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '50%',
+          overflow: 'hidden',
+          background: "radial-gradient(circle at 35% 35%, rgba(147,197,253,0.4), rgba(15,23,42,0.08) 38%), url('/textures/earth_day.jpg') center / cover no-repeat",
+          boxShadow: '0 0 50px rgba(59,130,246,0.2), inset 0 0 35px rgba(15,23,42,0.45)',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }} />
+        <div style={{
+          position: 'absolute',
+          inset: '-6%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(59,130,246,0.14) 0%, rgba(59,130,246,0.04) 50%, transparent 72%)',
+          pointerEvents: 'none',
+        }} />
+        {cities.map((city) => {
+          const pos = latLngToStaticPosition(city.lat, city.lng);
+          const isSelected = city.id === selectedCityId;
+
+          return (
+            <button
+              key={city.id}
+              type="button"
+              aria-label={city.name}
+              onClick={() => onCityClick(city.id)}
+              style={{
+                position: 'absolute',
+                left: pos.left,
+                top: pos.top,
+                transform: 'translate(-50%, -50%)',
+                width: isSelected ? '14px' : '10px',
+                height: isSelected ? '14px' : '10px',
+                borderRadius: '50%',
+                border: 'none',
+                padding: 0,
+                background: isSelected ? '#ffffff' : city.markerColor,
+                boxShadow: `0 0 ${isSelected ? '16px' : '10px'} ${city.markerColor}`,
+                cursor: 'pointer',
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 interface GlobeProps {
   cities: CityData[];
   selectedCityId: string;
@@ -156,6 +240,30 @@ interface GlobeProps {
 }
 
 export default function Globe({ cities, selectedCityId, onCityClick }: GlobeProps) {
+  const [canUseWebGL, setCanUseWebGL] = useState<boolean | null>(null);
+  const [canvasFailed, setCanvasFailed] = useState(false);
+  const isMobile = useMemo(() => isLikelyMobileDevice(), []);
+
+  useEffect(() => {
+    setCanUseWebGL(isWebGLAvailable());
+  }, []);
+
+  if (canUseWebGL === false || canvasFailed) {
+    return (
+      <StaticGlobeFallback
+        cities={cities}
+        selectedCityId={selectedCityId}
+        onCityClick={onCityClick}
+      />
+    );
+  }
+
+  if (canUseWebGL === null) {
+    return (
+      <div style={{ width: '100%', height: '100%' }} />
+    );
+  }
+
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <Canvas
@@ -164,10 +272,19 @@ export default function Globe({ cities, selectedCityId, onCityClick }: GlobeProp
         style={{ background: 'transparent' }}
         flat={true}
         onCreated={({ gl }) => {
-          gl.outputColorSpace = THREE.LinearSRGBColorSpace;
+          try {
+            gl.outputColorSpace = THREE.LinearSRGBColorSpace;
+          } catch (error) {
+            console.error('Canvas initialization failed:', error);
+            setCanvasFailed(true);
+          }
+        }}
+        fallback={<StaticGlobeFallback cities={cities} selectedCityId={selectedCityId} onCityClick={onCityClick} />}
+        onPointerMissed={() => {
+          document.body.style.cursor = 'auto';
         }}
       >
-        <Earth cities={cities} selectedCityId={selectedCityId} onCityClick={onCityClick} />
+        <Earth cities={cities} selectedCityId={selectedCityId} onCityClick={onCityClick} isMobile={isMobile} />
 
         <OrbitControls
           enableZoom={true}

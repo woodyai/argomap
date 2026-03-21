@@ -3,6 +3,7 @@ import type { CityData } from '../types';
 import Globe from './Globe';
 import StatsCounter from './StatsCounter';
 import MemoriesPanel from './MemoriesPanel';
+import ErrorBoundary from './ErrorBoundary';
 
 function useIsMobile(breakpoint = 768) {
   // Initialize with actual window width (client:only guarantees window exists)
@@ -74,11 +75,13 @@ export default function MapExperience({ cities, stats }: MapExperienceProps) {
 
         {/* Globe */}
         <div style={{ width: '300px', height: '300px', flexShrink: 0 }}>
-          <Globe
-            cities={cities}
-            selectedCityId={selectedCityId}
-            onCityClick={setSelectedCityId}
-          />
+          <ErrorBoundary title="Globe failed to load">
+            <Globe
+              cities={cities}
+              selectedCityId={selectedCityId}
+              onCityClick={setSelectedCityId}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Stats Counter */}
@@ -129,11 +132,13 @@ export default function MapExperience({ cities, stats }: MapExperienceProps) {
 
         {/* Globe */}
         <div style={{ width: '480px', height: '480px', position: 'relative', flexShrink: 0, margin: '-8px 0' }}>
-          <Globe
-            cities={cities}
-            selectedCityId={selectedCityId}
-            onCityClick={setSelectedCityId}
-          />
+          <ErrorBoundary title="Globe failed to load">
+            <Globe
+              cities={cities}
+              selectedCityId={selectedCityId}
+              onCityClick={setSelectedCityId}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Stats Counter */}
