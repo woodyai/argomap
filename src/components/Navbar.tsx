@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { Lang } from '../i18n/strings';
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(false);
@@ -11,8 +12,11 @@ function useIsMobile(breakpoint = 768) {
   return isMobile;
 }
 
-export default function Navbar() {
-  const [activeLang, setActiveLang] = useState<'zh' | 'en'>('en');
+interface NavbarProps {
+  lang?: Lang;
+}
+
+export default function Navbar({ lang = 'en' }: NavbarProps) {
   const isMobile = useIsMobile();
 
   return (
@@ -88,31 +92,29 @@ export default function Navbar() {
 
       {/* Language Switcher (nav links hidden on mobile since only HOME exists) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
-        <button
-          onClick={() => setActiveLang('zh')}
+        <a
+          href="/zh"
           style={{
-            background: 'none',
-            border: 'none',
-            color: activeLang === 'zh' ? '#ffffff' : 'rgba(255,255,255,0.5)',
-            fontWeight: activeLang === 'zh' ? 700 : 400,
+            color: lang === 'zh' ? '#ffffff' : 'rgba(255,255,255,0.5)',
+            fontWeight: lang === 'zh' ? 700 : 400,
             cursor: 'pointer',
             fontFamily: "'Nunito', sans-serif",
             fontSize: '13px',
             padding: '4px 6px',
             transition: 'all 0.2s',
+            textDecoration: lang === 'zh' ? 'underline' : 'none',
+            textUnderlineOffset: '4px',
           }}
         >
           ZH
-        </button>
+        </a>
         <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-        <button
-          onClick={() => setActiveLang('en')}
+        <a
+          href="/en"
           style={{
-            background: 'none',
-            border: 'none',
-            color: activeLang === 'en' ? '#ffffff' : 'rgba(255,255,255,0.5)',
-            fontWeight: activeLang === 'en' ? 700 : 400,
-            textDecoration: activeLang === 'en' ? 'underline' : 'none',
+            color: lang === 'en' ? '#ffffff' : 'rgba(255,255,255,0.5)',
+            fontWeight: lang === 'en' ? 700 : 400,
+            textDecoration: lang === 'en' ? 'underline' : 'none',
             textUnderlineOffset: '4px',
             cursor: 'pointer',
             fontFamily: "'Nunito', sans-serif",
@@ -122,7 +124,7 @@ export default function Navbar() {
           }}
         >
           EN
-        </button>
+        </a>
         {!isMobile && (
           <>
             <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
@@ -150,7 +152,7 @@ export default function Navbar() {
                 e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
               }}
             >
-              Unlock new languages!
+              {lang === 'zh' ? '解锁更多语言！' : 'Unlock new languages!'}
               <span style={{ fontSize: '14px', opacity: 0.8 }}>+</span>
             </button>
           </>

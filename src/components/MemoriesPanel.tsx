@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { CityData } from '../types';
+import { strings, type Lang } from '../i18n/strings';
 
 function SectionCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
@@ -20,10 +21,15 @@ function SectionCard({ children, style }: { children: React.ReactNode; style?: R
 
 interface MemoriesPanelProps {
   city: CityData;
+  lang: Lang;
 }
 
-export default function MemoriesPanel({ city }: MemoriesPanelProps) {
+export default function MemoriesPanel({ city, lang }: MemoriesPanelProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const copy = strings[lang];
+  const cityName = lang === 'zh' ? city.nameZh : city.name;
+  const countryName = lang === 'zh' ? city.countryZh : city.country;
+  const visitDate = city.visitDate === 'Home 🏠' ? copy.homeVisit : city.visitDate;
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800);
@@ -32,6 +38,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
 
   return (
     <div
+      className="hide-scrollbar"
       style={{
         width: '300px',
         maxHeight: 'calc(100vh - 120px)',
@@ -63,7 +70,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
             color: '#ffffff',
           }}
         >
-          MEMORIES: {city.name.toUpperCase()}
+          {copy.memories}: {lang === 'zh' ? city.nameZh : city.name.toUpperCase()}
         </h2>
         <p style={{
           fontFamily: "'Nunito', sans-serif",
@@ -72,7 +79,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
           color: 'rgba(255,255,255,0.4)',
           margin: '4px 0 0 0',
         }}>
-          {city.nameZh} · {city.countryZh} · {city.visitDate}
+          {cityName} · {countryName} · {visitDate}
         </p>
       </div>
 
@@ -87,7 +94,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
             color: '#ffffff',
           }}
         >
-          📔 Diary (日记)
+          {copy.diary}
         </h3>
         <p
           style={{
@@ -98,9 +105,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
             lineHeight: 1.5,
           }}
         >
-          {city.diary.en}
-          <br />
-          {city.diary.zh}
+          {lang === 'zh' ? city.diary.zh : city.diary.en}
         </p>
       </SectionCard>
 
@@ -115,7 +120,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
             color: '#ffffff',
           }}
         >
-          🌅 Photo Gallery (照片墙)
+          {copy.photos}
         </h3>
         <div
           style={{
@@ -173,7 +178,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
             color: '#ffffff',
           }}
         >
-          🤩 Mood Tracker (情绪记录)
+          {copy.mood}
         </h3>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
           {city.mood.map((mood, i) => (
@@ -209,7 +214,7 @@ export default function MemoriesPanel({ city }: MemoriesPanelProps) {
             color: '#ffffff',
           }}
         >
-          ⭐ Top Picks (热门推荐)
+          {copy.topPicks}
         </h3>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-start' }}>
           {city.topPicks.map((pick) => (

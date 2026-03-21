@@ -1,5 +1,5 @@
 import { useRef, useMemo, Suspense, useCallback, useEffect, useState } from 'react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { Canvas, useFrame, useLoader, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 import type { CityData } from '../types';
@@ -40,9 +40,10 @@ function isLikelyMobileDevice(): boolean {
   return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-function CityMarker({ lat, lng, color, radius, isSelected, onClick }: {
+function CityMarker({ lat, lng, color, radius, isSelected, onClick, isMobile }: {
   lat: number; lng: number; color: string; radius: number;
   isSelected?: boolean; onClick?: () => void;
+  isMobile?: boolean;
 }) {
   const ref = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -63,7 +64,7 @@ function CityMarker({ lat, lng, color, radius, isSelected, onClick }: {
     }
   });
 
-  const handleClick = useCallback((e: any) => {
+  const handleClick = useCallback((e: ThreeEvent<MouseEvent | PointerEvent>) => {
     e.stopPropagation();
     onClick?.();
   }, [onClick]);
@@ -77,12 +78,19 @@ function CityMarker({ lat, lng, color, radius, isSelected, onClick }: {
       <mesh
         ref={ref}
         onClick={handleClick}
+        onPointerDown={handleClick}
         onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
         onPointerOut={() => { document.body.style.cursor = 'auto'; }}
       >
-        <sphereGeometry args={[isSelected ? 0.038 : 0.028, 16, 16]} />
+        <sphereGeometry args={[isSelected ? (isMobile ? 0.055 : 0.038) : (isMobile ? 0.045 : 0.028), 16, 16]} />
         <meshBasicMaterial color={isSelected ? '#ffffff' : color} />
       </mesh>
+      {isMobile && (
+        <mesh onClick={handleClick} onPointerDown={handleClick}>
+          <sphereGeometry args={[0.12, 8, 8]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
+      )}
     </group>
   );
 }
@@ -169,6 +177,7 @@ function Earth({ cities, selectedCityId, onCityClick, isMobile }: EarthProps) {
           radius={RADIUS + 0.02}
           isSelected={city.id === selectedCityId}
           onClick={() => onCityClick(city.id)}
+          isMobile={isMobile}
         />
       ))}
     </group>
