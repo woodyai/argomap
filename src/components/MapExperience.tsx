@@ -23,13 +23,16 @@ interface MapExperienceProps {
   cities: CityData[];
   stats: { countries: number; cities: number; locations: number };
   lang?: Lang;
+  initialCityId?: string;
 }
 
-export default function MapExperience({ cities, stats, lang = 'en' }: MapExperienceProps) {
-  const [selectedCityId, setSelectedCityId] = useState(cities[0]?.id || '');
+export default function MapExperience({ cities, stats, lang = 'en', initialCityId }: MapExperienceProps) {
+  const initialSelectedCityId = cities.find(c => c.id === initialCityId)?.id || cities[0]?.id || '';
+  const [selectedCityId, setSelectedCityId] = useState(initialSelectedCityId);
   const selectedCity = cities.find(c => c.id === selectedCityId) || cities[0];
   const isMobile = useIsMobile();
   const copy = strings[lang];
+  const desktopPanelWidth = 520;
 
   // Hide SSR fallback once this component mounts
   useEffect(() => {
@@ -149,7 +152,19 @@ export default function MapExperience({ cities, stats, lang = 'en' }: MapExperie
   return (
     <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', height: '100vh', paddingTop: '56px' }}>
       {/* Center Column - Globe and Title */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingRight: '320px', height: '100%', gap: 0 }}>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingLeft: '32px',
+          paddingRight: `${desktopPanelWidth + 56}px`,
+          height: '100%',
+          gap: 0,
+        }}
+      >
         {/* Title */}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 20, flexShrink: 0 }}>
           <h1 style={{

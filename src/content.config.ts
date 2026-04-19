@@ -12,6 +12,10 @@ const cities = defineCollection({
     lng: z.number(),
     markerColor: z.string().default('#F59E0B'),
     visitDate: z.string(),
+    weatherTheme: z.object({
+      en: z.string(),
+      zh: z.string(),
+    }),
     diary: z.object({
       en: z.string(),
       zh: z.string(),
@@ -24,6 +28,18 @@ const cities = defineCollection({
     photos: z.array(z.object({
       color: z.string(),
       label: z.string(),
+    })),
+    places: z.array(z.object({
+      name: z.string(),
+      nameZh: z.string(),
+      lat: z.number(),
+      lng: z.number(),
+      category: z.string(),
+      icon: z.string(),
+      blurb: z.object({
+        en: z.string(),
+        zh: z.string(),
+      }),
     })),
   }),
 });

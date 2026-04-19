@@ -6,6 +6,9 @@ lat: 39.9042
 lng: 116.4074
 markerColor: "#F59E0B"
 visitDate: "Home 🏠"
+weatherTheme:
+  en: "Dry winter light, neon evenings, and fast-moving city energy."
+  zh: "干爽的冬日光线、霓虹夜色，还有节奏很快的城市能量。"
 diary:
   en: "The city is so vibrant! Sanlitun is amazing everywhere you go!"
   zh: "城市很繁华！三里屯哪儿哪儿都好！"
@@ -28,3 +31,31 @@ photos:
     label: "Street"
   - color: "#7ea8c9"
     label: "Sky"
+places:
+  - name: "Sanlitun Taikoo Li"
+    nameZh: "三里屯 Village 南区苹果店"
+    lat: 39.9358
+    lng: 116.4547
+    category: "Flagship"
+    icon: "🍎"
+    blurb:
+      en: "The South Village Apple Store is the specific Sanlitun memory anchor: glass, crowds, and flagship-store energy all in one frame."
+      zh: "把三里屯繁华感锁定到更具体的一帧：南区苹果店、玻璃立面、人流和旗舰店气场都在这里。"
+  - name: "Jingshan Park"
+    nameZh: "景山公园"
+    lat: 39.9324
+    lng: 116.3961
+    category: "Viewpoint"
+    icon: "🌇"
+    blurb:
+      en: "A calm high point for seeing Beijing's scale in one panoramic breath."
+      zh: "很适合一眼看清北京尺度的安静高点。"
+  - name: "Wangfujing"
+    nameZh: "王府井"
+    lat: 39.9155
+    lng: 116.4101
+    category: "Street"
+    icon: "🏮"
+    blurb:
+      en: "Classic central-Beijing bustle with endless lights, food, and movement."
+      zh: "很典型的北京核心区热闹感，灯光、食物和人流都很足。"

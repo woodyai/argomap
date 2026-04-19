@@ -6,6 +6,9 @@ lat: 22.3193
 lng: 114.1694
 markerColor: "#EF4444"
 visitDate: "2025-07"
+weatherTheme:
+  en: "Warm sea air, dramatic clouds, and amusement-park sparkle after sunset."
+  zh: "带着海风的湿热空气、戏剧性的云层，还有夜晚乐园一样的闪光感。"
 diary:
   en: "Disneyland was so much fun!"
   zh: "迪士尼真好玩儿啊！"
@@ -22,3 +25,31 @@ photos:
     label: "Fireworks"
   - color: "#c8e6c0"
     label: "Rides"
+places:
+  - name: "Hong Kong Disneyland"
+    nameZh: "香港迪士尼乐园"
+    lat: 22.3129
+    lng: 114.0413
+    category: "Theme Park"
+    icon: "🏰"
+    blurb:
+      en: "Pure fun energy, with castle colors and fireworks carrying the memory."
+      zh: "回忆核心就是快乐，城堡色彩和烟花把气氛拉满。"
+  - name: "Victoria Peak"
+    nameZh: "太平山顶"
+    lat: 22.2759
+    lng: 114.1455
+    category: "Viewpoint"
+    icon: "🌃"
+    blurb:
+      en: "The skyline reveal that makes Hong Kong feel cinematic."
+      zh: "能把香港拍得很像电影的一处天际线视角。"
+  - name: "Tsim Sha Tsui Promenade"
+    nameZh: "尖沙咀海滨长廊"
+    lat: 22.2933
+    lng: 114.1747
+    category: "Waterfront"
+    icon: "🌊"
+    blurb:
+      en: "A classic harbor walk with reflections, ferries, and dense city light."
+      zh: "维港、渡轮、倒影和密集灯光都在这里汇合。"

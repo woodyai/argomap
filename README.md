@@ -1,46 +1,35 @@
-# Astro Starter Kit: Basics
+# ArgoMap
 
-```sh
-npm create astro@latest -- --template basics
+An Astro + React travel memory site for Argo, with a 3D globe, city memories, live Google Maps exploration, weather, and embedded Street View.
+
+## Local Run
+
+```bash
+npm install
+cp .env.example .env
+npm run dev -- --host 127.0.0.1
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Open `http://127.0.0.1:4321/` or `http://127.0.0.1:4321/zh/`.
 
-## 🚀 Project Structure
+## Google Maps Setup
 
-Inside of your Astro project, you'll see the following folders and files:
+Add these values to `.env`:
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```bash
+PUBLIC_GOOGLE_MAPS_API_KEY=your_demo_or_standard_key_here
+PUBLIC_GOOGLE_MAPS_MAP_ID=your_optional_cloud_map_id_here
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Notes:
+- `PUBLIC_GOOGLE_MAPS_API_KEY` is required for the live map, place search, weather, and embedded Street View.
+- `PUBLIC_GOOGLE_MAPS_MAP_ID` is optional. Leave it out if you just want to prototype with the current fallback.
+- The current UI uses Maps JavaScript API, Places widgets, Weather API, and embedded Street View via the Maps JavaScript API.
 
-## 🧞 Commands
+## Commands
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+npm run dev
+npm run build
+npm run preview
+```

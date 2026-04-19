@@ -110,7 +110,7 @@ export default function Navbar({ lang = 'en' }: NavbarProps) {
         </a>
         <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
         <a
-          href="/en"
+          href="/"
           style={{
             color: lang === 'en' ? '#ffffff' : 'rgba(255,255,255,0.5)',
             fontWeight: lang === 'en' ? 700 : 400,

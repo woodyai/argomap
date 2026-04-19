@@ -6,6 +6,9 @@ lat: 34.6937
 lng: 135.5023
 markerColor: "#EF4444"
 visitDate: "2018-08"
+weatherTheme:
+  en: "Neon reflections, humid nights, and food-street momentum that never really stops."
+  zh: "霓虹倒影、潮湿夜色，还有几乎不会停下来的美食街节奏。"
 diary:
   en: "Umm... I don't really remember (I was only one, can you blame me?!)"
   zh: "呃，好像不记得了（我只有一岁忘记了吗！）"
@@ -20,3 +23,31 @@ photos:
     label: "Castle"
   - color: "#c97ea8"
     label: "Neon"
+places:
+  - name: "Dotonbori"
+    nameZh: "道顿堀"
+    lat: 34.6687
+    lng: 135.5013
+    category: "Food Street"
+    icon: "🍜"
+    blurb:
+      en: "The loudest, brightest Osaka postcard in motion."
+      zh: "很像会动起来的大阪明信片，又亮又热闹。"
+  - name: "Osaka Castle"
+    nameZh: "大阪城"
+    lat: 34.6873
+    lng: 135.5259
+    category: "Landmark"
+    icon: "🏯"
+    blurb:
+      en: "A grand historic anchor that balances the city's neon energy."
+      zh: "像是给整座城市霓虹感做平衡的一处历史锚点。"
+  - name: "Shinsekai"
+    nameZh: "新世界"
+    lat: 34.6525
+    lng: 135.5063
+    category: "District"
+    icon: "🎡"
+    blurb:
+      en: "Retro Osaka at full personality, especially after dark."
+      zh: "很有个性的复古大阪，尤其适合夜里看。"

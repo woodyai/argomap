@@ -6,6 +6,9 @@ lat: 35.0116
 lng: 135.7681
 markerColor: "#EF4444"
 visitDate: "2018-08"
+weatherTheme:
+  en: "Cicada summer, temple shade, and a slower rhythm that feels older than the streets."
+  zh: "蝉鸣夏天、寺庙阴影，还有一种比街道更古老的慢节奏。"
 diary:
   en: "Umm... I don't really remember (I was only one, can you blame me?!)"
   zh: "呃，好像不记得了（我只有一岁忘记了吗！）"
@@ -20,3 +23,31 @@ photos:
     label: "Garden"
   - color: "#d4b896"
     label: "Torii"
+places:
+  - name: "Kiyomizu-dera"
+    nameZh: "清水寺"
+    lat: 34.9949
+    lng: 135.7850
+    category: "Temple"
+    icon: "⛩️"
+    blurb:
+      en: "One of Kyoto's iconic first-look places, full of hillside views and old wood."
+      zh: "很适合第一次理解京都气质的标志性地点，山景和木构都很强。"
+  - name: "Fushimi Inari Taisha"
+    nameZh: "伏见稻荷大社"
+    lat: 34.9671
+    lng: 135.7727
+    category: "Shrine"
+    icon: "🦊"
+    blurb:
+      en: "Layered torii gates that turn walking into a memory tunnel."
+      zh: "成排鸟居会把散步变成一条很有记忆感的隧道。"
+  - name: "Arashiyama Bamboo Grove"
+    nameZh: "岚山竹林"
+    lat: 35.0170
+    lng: 135.6713
+    category: "Nature"
+    icon: "🎋"
+    blurb:
+      en: "A softer, greener side of Kyoto with movement in every breeze."
+      zh: "更柔和也更绿色的一面，风一吹就很有流动感。"
