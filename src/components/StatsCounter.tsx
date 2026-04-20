@@ -1,70 +1,45 @@
 import { useEffect, useState } from 'react';
-
-function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < breakpoint);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, [breakpoint]);
-  return isMobile;
-}
+import { strings, type Lang } from '../i18n/strings';
 
 interface StatItemProps {
-  icon: string;
   value: number;
   label: string;
   delay: number;
-  compact?: boolean;
 }
 
-function StatItem({ icon, value, label, delay, compact }: StatItemProps) {
+function useCountUp(value: number, delay: number, duration = 1100) {
   const [count, setCount] = useState(0);
-  const [visible, setVisible] = useState(false);
-
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  useEffect(() => {
-    if (!visible) return;
-    const duration = 1500;
-    const startTime = Date.now();
-
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * value));
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
+    let raf = 0;
+    const timer = window.setTimeout(() => {
+      const start = Date.now();
+      const tick = () => {
+        const p = Math.min((Date.now() - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setCount(Math.round(eased * value));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }, delay);
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(raf);
     };
-    requestAnimationFrame(animate);
-  }, [visible, value]);
+  }, [value, delay, duration]);
+  return count;
+}
 
+function StatItem({ value, label, delay }: StatItemProps) {
+  const count = useCountUp(value, delay);
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: compact ? '4px' : '8px',
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(10px)',
-        transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}
-    >
-      <span style={{ fontSize: compact ? '16px' : '24px' }}>{icon}</span>
+    <div style={{ textAlign: 'center', fontFamily: 'var(--argo-fui)' }}>
       <span
         style={{
-          fontFamily: "'Nunito', sans-serif",
-          fontSize: compact ? '22px' : '36px',
-          fontWeight: 900,
-          color: '#ffffff',
-          textShadow: '0 0 20px rgba(255,255,255,0.3)',
+          fontSize: '21px',
+          fontWeight: 600,
+          letterSpacing: '-0.04em',
+          display: 'block',
+          color: 'var(--argo-t1)',
           lineHeight: 1,
         }}
       >
@@ -72,12 +47,12 @@ function StatItem({ icon, value, label, delay, compact }: StatItemProps) {
       </span>
       <span
         style={{
-          fontFamily: "'Nunito', sans-serif",
-          fontSize: compact ? '11px' : '13px',
-          fontWeight: 500,
-          color: 'rgba(255,255,255,0.6)',
-          letterSpacing: '0.5px',
-          marginTop: compact ? '2px' : '4px',
+          fontSize: '9px',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'var(--argo-t3)',
+          display: 'block',
+          marginTop: '4px',
         }}
       >
         {label}
@@ -90,31 +65,28 @@ interface StatsCounterProps {
   countries: number;
   cities: number;
   locations: number;
+  lang?: Lang;
 }
 
-export default function StatsCounter({ countries, cities, locations }: StatsCounterProps) {
-  const isMobile = useIsMobile();
-
+export default function StatsCounter({ countries, cities, locations, lang = 'en' }: StatsCounterProps) {
+  const copy = strings[lang];
+  const sep = (
+    <div style={{ width: 1, alignSelf: 'stretch', background: 'var(--argo-border)' }} />
+  );
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: isMobile ? '16px' : '40px',
-        padding: isMobile ? '10px 16px' : '16px 40px',
-        background: 'rgba(255,255,255,0.05)',
-        backdropFilter: 'blur(12px)',
-        borderRadius: isMobile ? '16px' : '20px',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+        gap: '28px',
+        alignItems: 'stretch',
+        animation: 'argoFadeUp 0.9s 0.2s ease both',
       }}
     >
-      <StatItem icon="🌍" value={countries} label="Countries" delay={200} compact={isMobile} />
-      <div style={{ width: '1px', height: isMobile ? '24px' : '36px', background: 'rgba(255,255,255,0.1)' }} />
-      <StatItem icon="🏙️" value={cities} label="Cities" delay={400} compact={isMobile} />
-      <div style={{ width: '1px', height: isMobile ? '24px' : '36px', background: 'rgba(255,255,255,0.1)' }} />
-      <StatItem icon="📍" value={locations} label="Locations" delay={600} compact={isMobile} />
+      <StatItem value={countries} label={copy.statCountries} delay={250} />
+      {sep}
+      <StatItem value={cities} label={copy.statCities} delay={420} />
+      {sep}
+      <StatItem value={locations} label={copy.statPlaces} delay={580} />
     </div>
   );
 }

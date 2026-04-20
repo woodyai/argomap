@@ -4,6 +4,8 @@
   --font-nunito: 'Nunito', sans-serif;
   --font-inter: 'Inter', sans-serif;
   --font-caveat: 'Caveat', cursive;
+  --font-grotesk: 'Space Grotesk', system-ui, sans-serif;
+  --font-lora: 'Lora', Georgia, serif;
 
   --color-space-900: #070b1a;
   --color-space-800: #0d1333;
@@ -14,6 +16,35 @@
   --color-accent-light: #fbbf24;
   --color-secondary: #10B981;
   --color-coral: #ef7c6e;
+}
+
+/* ArgoMap "cosmic explorer" design tokens (from new design handoff) */
+:root {
+  --argo-bg: #070a14;
+  --argo-surface: rgba(9, 14, 36, 0.72);
+  --argo-surface-2: rgba(13, 20, 52, 0.88);
+  --argo-border: rgba(75, 125, 255, 0.11);
+  --argo-border-hi: rgba(100, 155, 255, 0.28);
+  --argo-accent: #5b9fff;
+  --argo-accent-warm: #f5a742;
+  --argo-t1: rgba(228, 235, 255, 0.93);
+  --argo-t2: rgba(155, 178, 225, 0.72);
+  --argo-t3: rgba(90, 115, 170, 0.55);
+  --argo-fui: 'Space Grotesk', system-ui, sans-serif;
+  --argo-fser: 'Lora', Georgia, serif;
+  --argo-blur: blur(22px);
+}
+
+@keyframes argoFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes argoSlideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes argoMoodFill {
+  from { width: 0%; }
 }
 
 @layer base {

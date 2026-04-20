@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { CityData } from '../types';
 import Globe from './Globe';
+import ArgoDotGlobe from './ArgoDotGlobe';
 import StatsCounter from './StatsCounter';
 import MemoriesPanel from './MemoriesPanel';
 import ErrorBoundary from './ErrorBoundary';
 import { strings, type Lang } from '../i18n/strings';
 
+type GlobeMode = 'argo' | 'memory';
+
 function useIsMobile(breakpoint = 768) {
-  // Initialize with actual window width (client:only guarantees window exists)
   const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth < breakpoint : false
+    typeof window !== 'undefined' ? window.innerWidth < breakpoint : false,
   );
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < breakpoint);
@@ -19,6 +21,19 @@ function useIsMobile(breakpoint = 768) {
   return isMobile;
 }
 
+function useGlobeMode(initial: GlobeMode = 'argo') {
+  const [mode, setMode] = useState<GlobeMode>(initial);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ mode?: GlobeMode }>).detail;
+      if (detail?.mode) setMode(detail.mode);
+    };
+    window.addEventListener('argomap:globe-mode', handler);
+    return () => window.removeEventListener('argomap:globe-mode', handler);
+  }, []);
+  return mode;
+}
+
 interface MapExperienceProps {
   cities: CityData[];
   stats: { countries: number; cities: number; locations: number };
@@ -26,15 +41,75 @@ interface MapExperienceProps {
   initialCityId?: string;
 }
 
-export default function MapExperience({ cities, stats, lang = 'en', initialCityId }: MapExperienceProps) {
-  const initialSelectedCityId = cities.find(c => c.id === initialCityId)?.id || cities[0]?.id || '';
-  const [selectedCityId, setSelectedCityId] = useState(initialSelectedCityId);
-  const selectedCity = cities.find(c => c.id === selectedCityId) || cities[0];
-  const isMobile = useIsMobile();
-  const copy = strings[lang];
-  const desktopPanelWidth = 520;
+const PANEL_WIDTH = 400;
+const NAV_HEIGHT = 56;
 
-  // Hide SSR fallback once this component mounts
+function getCopy(lang: Lang) {
+  return strings[lang];
+}
+
+function Hero({ copy, align = 'center' }: { copy: ReturnType<typeof getCopy>; align?: 'center' | 'left' }) {
+  return (
+    <div
+      style={{
+        textAlign: align,
+        animation: 'argoFadeUp 0.9s ease both',
+        fontFamily: 'var(--argo-fui)',
+      }}
+    >
+      <div
+        style={{
+          fontSize: '9.5px',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: 'var(--argo-accent)',
+          fontWeight: 500,
+          marginBottom: '9px',
+          opacity: 0.85,
+        }}
+      >
+        {copy.heroEyebrow}
+      </div>
+      <h1
+        style={{
+          fontSize: 'clamp(24px, 3vw, 40px)',
+          fontWeight: 300,
+          letterSpacing: '-0.045em',
+          color: 'var(--argo-t1)',
+          lineHeight: 1.08,
+          margin: 0,
+        }}
+      >
+        {copy.heroLineA}
+        <br />
+        <strong style={{ fontWeight: 700 }}>{copy.heroLineB}</strong>
+      </h1>
+      <p
+        style={{
+          marginTop: '10px',
+          fontSize: '12.5px',
+          color: 'var(--argo-t2)',
+          maxWidth: '300px',
+          marginLeft: align === 'center' ? 'auto' : 0,
+          marginRight: align === 'center' ? 'auto' : 0,
+          lineHeight: 1.65,
+        }}
+      >
+        {copy.heroLead}
+      </p>
+    </div>
+  );
+}
+
+export default function MapExperience({ cities, stats, lang = 'en', initialCityId }: MapExperienceProps) {
+  const initialId = cities.find((c) => c.id === initialCityId)?.id || cities[0]?.id || '';
+  const [selectedCityId, setSelectedCityId] = useState(initialId);
+  const globeMode = useGlobeMode('argo');
+  const selectedCity = cities.find((c) => c.id === selectedCityId) || cities[0];
+  const isMobile = useIsMobile();
+  const copy = getCopy(lang);
+
+  // Hide SSR fallback once mounted
   useEffect(() => {
     const fallback = document.getElementById('ssr-fallback');
     if (fallback) fallback.style.display = 'none';
@@ -45,113 +120,84 @@ export default function MapExperience({ cities, stats, lang = 'en', initialCityI
       <div
         className="hide-scrollbar"
         style={{
-        position: 'relative',
-        zIndex: 10,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        minHeight: '100vh',
-        paddingTop: '64px',
-        paddingBottom: '32px',
-        overflowY: 'auto',
-        gap: '8px',
-      }}
+          position: 'relative',
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          minHeight: '100vh',
+          paddingTop: `${NAV_HEIGHT + 12}px`,
+          paddingBottom: '32px',
+          overflowY: 'auto',
+          gap: '14px',
+          color: 'var(--argo-t1)',
+        }}
       >
-        {/* Title */}
-        <div style={{ textAlign: 'center', flexShrink: 0 }}>
-          <h1 style={{
-            fontFamily: "'Nunito', sans-serif",
-            fontSize: '24px',
-            fontWeight: 900,
-            letterSpacing: '3px',
-            margin: 0,
-            color: '#ffffff',
-            textShadow: '0 0 60px rgba(59,130,246,0.25), 0 2px 10px rgba(0,0,0,0.5)',
-          }}>
-            {copy.heroTitle}
-          </h1>
-          <p style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: '12px',
-            fontWeight: 300,
-            color: 'rgba(255,255,255,0.45)',
-            margin: '4px 0 0 0',
-            letterSpacing: '2px',
-          }}>
-            {copy.heroSubtitle}
-          </p>
+        <div style={{ padding: '0 18px', width: '100%' }}>
+          <Hero copy={copy} align="center" />
         </div>
 
-        {/* Globe */}
-        <div style={{ width: '300px', height: '300px', flexShrink: 0 }}>
+        <div style={{ width: '300px', height: '300px', flexShrink: 0, position: 'relative', marginTop: '8px' }}>
           <ErrorBoundary title="Globe failed to load">
-            <Globe
-              cities={cities}
-              selectedCityId={selectedCityId}
-              onCityClick={setSelectedCityId}
-            />
+            {globeMode === 'memory' ? (
+              <Globe
+                cities={cities}
+                selectedCityId={selectedCityId}
+                onCityClick={setSelectedCityId}
+              />
+            ) : (
+              <ArgoDotGlobe
+                cities={cities}
+                selectedCityId={selectedCityId}
+                onCityClick={setSelectedCityId}
+                size={300}
+                lang={lang}
+              />
+            )}
           </ErrorBoundary>
         </div>
 
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          gap: '8px',
-          overflowX: 'auto',
-          padding: '4px 16px 2px 16px',
-          flexShrink: 0,
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-        }}>
-          {cities.map((city) => {
-            const cityLabel = lang === 'zh' ? city.nameZh : city.name;
-            const isActive = city.id === selectedCityId;
-
-            return (
-              <button
-                key={city.id}
-                type="button"
-                onClick={() => setSelectedCityId(city.id)}
-                style={{
-                  flexShrink: 0,
-                  padding: '7px 14px',
-                  borderRadius: '999px',
-                  border: isActive ? '1px solid rgba(255,255,255,0.45)' : '1px solid rgba(255,255,255,0.14)',
-                  background: isActive ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.05)',
-                  color: isActive ? '#ffffff' : 'rgba(255,255,255,0.68)',
-                  fontSize: '12px',
-                  fontFamily: "'Nunito', sans-serif",
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  boxShadow: isActive ? '0 10px 24px rgba(15,23,42,0.2)' : 'none',
-                }}
-              >
-                {cityLabel}
-              </button>
-            );
-          })}
+        <div
+          style={{
+            fontSize: '9.5px',
+            color: 'var(--argo-t3)',
+            letterSpacing: '0.07em',
+            fontFamily: 'var(--argo-fui)',
+          }}
+        >
+          {copy.globeHint}
         </div>
 
-        {/* Stats Counter */}
-        <div style={{ flexShrink: 0, marginTop: '-8px' }}>
+        <div style={{ marginTop: '4px' }}>
           <StatsCounter
             countries={stats.countries}
             cities={stats.cities}
             locations={stats.locations}
+            lang={lang}
           />
         </div>
 
-        {/* Memories Panel - inline below globe */}
-        <div style={{ width: '100%', padding: '0 16px', marginTop: '8px' }}>
+        <div style={{ width: '100%', padding: '0 16px', marginTop: '4px' }}>
           {selectedCity && <MemoriesPanel city={selectedCity} lang={lang} fullWidth />}
         </div>
       </div>
     );
   }
 
+  // Desktop
   return (
-    <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', height: '100vh', paddingTop: '56px' }}>
-      {/* Center Column - Globe and Title */}
+    <div
+      style={{
+        position: 'fixed',
+        top: NAV_HEIGHT,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        zIndex: 10,
+        color: 'var(--argo-t1)',
+      }}
+    >
       <div
         style={{
           flex: 1,
@@ -159,60 +205,62 @@ export default function MapExperience({ cities, stats, lang = 'en', initialCityI
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          paddingLeft: '32px',
-          paddingRight: `${desktopPanelWidth + 56}px`,
-          height: '100%',
-          gap: 0,
+          padding: '16px 24px',
+          minWidth: 0,
+          position: 'relative',
+          gap: '14px',
         }}
       >
-        {/* Title */}
-        <div style={{ textAlign: 'center', position: 'relative', zIndex: 20, flexShrink: 0 }}>
-          <h1 style={{
-            fontFamily: "'Nunito', sans-serif",
-            fontSize: '40px',
-            fontWeight: 900,
-            letterSpacing: '5px',
-            margin: 0,
-            color: '#ffffff',
-            textShadow: '0 0 60px rgba(59,130,246,0.25), 0 2px 10px rgba(0,0,0,0.5)',
-          }}>
-            {copy.heroTitle}
-          </h1>
-          <p style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: '14px',
-            fontWeight: 300,
-            color: 'rgba(255,255,255,0.45)',
-            margin: '6px 0 0 0',
-            letterSpacing: '3px',
-          }}>
-            {copy.heroSubtitle}
-          </p>
+        <Hero copy={copy} align="center" />
+
+        <div style={{ position: 'relative' }}>
+          <div style={{ width: '480px', height: '480px', position: 'relative' }}>
+            <ErrorBoundary title="Globe failed to load">
+              {globeMode === 'memory' ? (
+                <Globe
+                  cities={cities}
+                  selectedCityId={selectedCityId}
+                  onCityClick={setSelectedCityId}
+                />
+              ) : (
+                <ArgoDotGlobe
+                  cities={cities}
+                  selectedCityId={selectedCityId}
+                  onCityClick={setSelectedCityId}
+                  size={480}
+                  lang={lang}
+                />
+              )}
+            </ErrorBoundary>
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '-22px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '9.5px',
+              color: 'var(--argo-t3)',
+              whiteSpace: 'nowrap',
+              letterSpacing: '0.07em',
+              fontFamily: 'var(--argo-fui)',
+            }}
+          >
+            {copy.globeHint}
+          </div>
         </div>
 
-        {/* Globe */}
-        <div style={{ width: '480px', height: '480px', position: 'relative', flexShrink: 0, margin: '-8px 0' }}>
-          <ErrorBoundary title="Globe failed to load">
-            <Globe
-              cities={cities}
-              selectedCityId={selectedCityId}
-              onCityClick={setSelectedCityId}
-            />
-          </ErrorBoundary>
-        </div>
-
-        {/* Stats Counter */}
-        <div style={{ position: 'relative', zIndex: 20, flexShrink: 0, marginTop: '-16px' }}>
+        <div style={{ marginTop: '24px' }}>
           <StatsCounter
             countries={stats.countries}
             cities={stats.cities}
             locations={stats.locations}
+            lang={lang}
           />
         </div>
       </div>
 
-      {/* Right Panel - Memories */}
-      <div style={{ position: 'fixed', right: '20px', top: '72px', bottom: '12px', zIndex: 50, display: 'flex', alignItems: 'flex-start' }}>
+      <div style={{ width: PANEL_WIDTH, height: '100%', flexShrink: 0 }}>
         {selectedCity && <MemoriesPanel city={selectedCity} lang={lang} />}
       </div>
     </div>

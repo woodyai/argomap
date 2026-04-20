@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { Lang } from '../i18n/strings';
+import { useEffect, useState } from 'react';
+import { strings, type Lang } from '../i18n/strings';
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(false);
@@ -12,12 +12,39 @@ function useIsMobile(breakpoint = 768) {
   return isMobile;
 }
 
+type GlobeMode = 'argo' | 'memory';
+
 interface NavbarProps {
   lang?: Lang;
 }
 
+const NAV_HEIGHT = 56;
+
+function useGlobeModeBus(initial: GlobeMode = 'argo') {
+  const [mode, setMode] = useState<GlobeMode>(initial);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ mode?: GlobeMode }>).detail;
+      if (detail?.mode) setMode(detail.mode);
+    };
+    window.addEventListener('argomap:globe-mode', handler);
+    return () => window.removeEventListener('argomap:globe-mode', handler);
+  }, []);
+  return mode;
+}
+
+function setGlobeMode(mode: GlobeMode) {
+  window.dispatchEvent(new CustomEvent('argomap:globe-mode', { detail: { mode } }));
+}
+
 export default function Navbar({ lang = 'en' }: NavbarProps) {
   const isMobile = useIsMobile();
+  const mode = useGlobeModeBus('argo');
+  const isZh = lang === 'zh';
+  const copy = strings[lang];
+
+  const ctaLabel = isZh ? '开始记录' : 'Start Mapping';
+  const altLangLabel = 'EN / 中文';
 
   return (
     <nav
@@ -26,136 +53,190 @@ export default function Navbar({ lang = 'en' }: NavbarProps) {
         top: 0,
         left: 0,
         right: 0,
+        height: NAV_HEIGHT,
         zIndex: 100,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: isMobile ? '10px 16px' : '16px 40px',
-        background: 'linear-gradient(180deg, rgba(7,11,26,0.85) 0%, rgba(7,11,26,0.4) 70%, transparent 100%)',
-        backdropFilter: 'blur(8px)',
+        gap: '16px',
+        padding: isMobile ? '0 14px' : '0 22px',
+        background: 'rgba(6,9,18,0.55)',
+        backdropFilter: 'var(--argo-blur)',
+        WebkitBackdropFilter: 'var(--argo-blur)',
+        borderBottom: '1px solid var(--argo-border)',
+        fontFamily: 'var(--argo-fui)',
       }}
     >
+      {/* Soft underline gradient (matches design) */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: -1,
+          height: 1,
+          background:
+            'linear-gradient(90deg, transparent, rgba(91,159,255,0.18) 35%, rgba(245,167,66,0.14) 65%, transparent)',
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '10px' }}>
+      <a
+        href={isZh ? '/zh/' : '/'}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '9px',
+          textDecoration: 'none',
+          color: 'inherit',
+        }}
+      >
         <div
           style={{
-            width: isMobile ? '32px' : '44px',
-            height: isMobile ? '32px' : '44px',
+            width: '28px',
+            height: '28px',
             borderRadius: '50%',
-            background: 'radial-gradient(circle at 30% 30%, #5b9cf5, #1a4fa0)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 20px rgba(59,130,246,0.4), inset 0 -2px 4px rgba(0,0,0,0.3)',
-            position: 'relative',
             flexShrink: 0,
+            background: 'radial-gradient(circle at 33% 33%, #3a72d8, #0b1748)',
+            border: '1px solid rgba(100,160,255,0.4)',
+            boxShadow: '0 0 14px rgba(70,120,255,0.25)',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <svg width={isMobile ? '20' : '28'} height={isMobile ? '20' : '28'} viewBox="0 0 28 28" fill="none">
-            <circle cx="14" cy="14" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5" />
-            <circle cx="14" cy="14" r="6" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
-            <path d="M14 4 L15.5 10 L14 8 L12.5 10 Z" fill="#F59E0B" />
-            <path d="M14 24 L15.5 18 L14 20 L12.5 18 Z" fill="rgba(255,255,255,0.5)" />
-            <path d="M24 14 L18 15.5 L20 14 L18 12.5 Z" fill="rgba(255,255,255,0.5)" />
-            <path d="M4 14 L10 15.5 L8 14 L10 12.5 Z" fill="rgba(255,255,255,0.5)" />
-            <circle cx="14" cy="14" r="2" fill="white" opacity="0.9" />
-          </svg>
-          {!isMobile && [0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-            <div
-              key={deg}
-              style={{
-                position: 'absolute',
-                width: '3px',
-                height: '3px',
-                borderRadius: '50%',
-                background: '#F59E0B',
-                transform: `rotate(${deg}deg) translateY(-24px)`,
-                opacity: deg % 90 === 0 ? 1 : 0.5,
-              }}
-            />
-          ))}
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: '18%',
+              left: '10%',
+              width: '75%',
+              height: '28%',
+              background: 'rgba(255,255,255,0.13)',
+              borderRadius: '50%',
+              filter: 'blur(2px)',
+            }}
+          />
         </div>
         <span
           style={{
-            fontFamily: "'Nunito', sans-serif",
-            fontSize: isMobile ? '17px' : '22px',
-            fontWeight: 800,
-            letterSpacing: '0.5px',
-            background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            fontSize: '15px',
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+            color: 'var(--argo-t1)',
           }}
         >
-          ArgoMap
+          Argo<span style={{ color: 'var(--argo-accent)' }}>Map</span>
         </span>
-      </div>
+      </a>
 
-      {/* Language Switcher (nav links hidden on mobile since only HOME exists) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
-        <a
-          href="/zh"
-          style={{
-            color: lang === 'zh' ? '#ffffff' : 'rgba(255,255,255,0.5)',
-            fontWeight: lang === 'zh' ? 700 : 400,
-            cursor: 'pointer',
-            fontFamily: "'Nunito', sans-serif",
-            fontSize: '13px',
-            padding: '4px 6px',
-            transition: 'all 0.2s',
-            textDecoration: lang === 'zh' ? 'underline' : 'none',
-            textUnderlineOffset: '4px',
-          }}
-        >
-          ZH
-        </a>
-        <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-        <a
-          href="/"
-          style={{
-            color: lang === 'en' ? '#ffffff' : 'rgba(255,255,255,0.5)',
-            fontWeight: lang === 'en' ? 700 : 400,
-            textDecoration: lang === 'en' ? 'underline' : 'none',
-            textUnderlineOffset: '4px',
-            cursor: 'pointer',
-            fontFamily: "'Nunito', sans-serif",
-            fontSize: '13px',
-            padding: '4px 6px',
-            transition: 'all 0.2s',
-          }}
-        >
-          EN
-        </a>
-        {!isMobile && (
-          <>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
+      {/* Centered breadcrumb — globe-mode switcher */}
+      {!isMobile && (
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '11.5px',
+              color: 'var(--argo-t3)',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--argo-border)',
+              borderRadius: '20px',
+              padding: '4px 6px 4px 12px',
+            }}
+          >
             <button
+              type="button"
+              onClick={() => setGlobeMode('argo')}
               style={{
                 background: 'none',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '20px',
-                color: 'rgba(255,255,255,0.7)',
+                border: 'none',
+                padding: 0,
+                font: 'inherit',
+                color: mode === 'argo' ? 'var(--argo-accent)' : 'var(--argo-t3)',
+                fontWeight: mode === 'argo' ? 500 : 400,
                 cursor: 'pointer',
-                fontFamily: "'Nunito', sans-serif",
-                fontSize: '12px',
-                padding: '4px 14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.3s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)';
-                e.currentTarget.style.color = '#fff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
               }}
             >
-              {lang === 'zh' ? '解锁更多语言！' : 'Unlock new languages!'}
-              <span style={{ fontSize: '14px', opacity: 0.8 }}>+</span>
+              {copy.navWorld}
             </button>
-          </>
+            <span style={{ opacity: 0.4 }}>›</span>
+            <button
+              type="button"
+              onClick={() => setGlobeMode('memory')}
+              style={{
+                background: mode === 'memory' ? 'rgba(91,159,255,0.12)' : 'transparent',
+                border: '1px solid',
+                borderColor: mode === 'memory' ? 'rgba(91,159,255,0.28)' : 'transparent',
+                borderRadius: '14px',
+                padding: '2px 10px',
+                font: 'inherit',
+                color: mode === 'memory' ? 'var(--argo-accent)' : 'var(--argo-t2)',
+                fontWeight: mode === 'memory' ? 500 : 400,
+                cursor: 'pointer',
+                transition: '0.18s',
+              }}
+            >
+              {copy.navArgosWorld}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isMobile && <div style={{ flex: 1 }} />}
+
+      {/* Right cluster */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <a
+          href={isZh ? '/' : '/zh/'}
+          style={{
+            font: '500 11px/1 var(--argo-fui)',
+            color: 'var(--argo-t2)',
+            background: 'none',
+            border: '1px solid var(--argo-border)',
+            borderRadius: '8px',
+            padding: '5px 11px',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            transition: '0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--argo-border-hi)';
+            e.currentTarget.style.color = 'var(--argo-t1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--argo-border)';
+            e.currentTarget.style.color = 'var(--argo-t2)';
+          }}
+        >
+          {altLangLabel}
+        </a>
+        {!isMobile && (
+          <button
+            type="button"
+            style={{
+              font: '600 11px/1 var(--argo-fui)',
+              color: '#fff',
+              background: 'var(--argo-accent)',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '6px 14px',
+              cursor: 'pointer',
+              transition: '0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.85';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            {ctaLabel}
+          </button>
         )}
       </div>
     </nav>

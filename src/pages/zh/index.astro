@@ -2,7 +2,6 @@
 import Layout from '../../layouts/Layout.astro';
 import StarBackground from '../../components/StarBackground';
 import Navbar from '../../components/Navbar';
-import FloatingElements from '../../components/FloatingElements';
 import MapExperience from '../../components/MapExperience';
 import { getCollection } from 'astro:content';
 import { strings } from '../../i18n/strings';
@@ -23,19 +22,19 @@ const stats = {
 ---
 
 <Layout title={copy.pageTitle} lang={lang}>
-  <main style="position: relative; min-height: 100vh; overflow-x: hidden; background: radial-gradient(ellipse at 50% 40%, #0d1b3e 0%, #070b1a 60%, #050816 100%);">
+  <main style="position: relative; min-height: 100vh; overflow-x: hidden; background: #070a14;">
     <StarBackground client:load />
-    <FloatingElements client:load />
     <Navbar client:load lang={lang} />
 
-    <div style="position: absolute; top: 50%; left: calc(50% - 150px); transform: translate(-50%, -50%); width: 550px; height: 550px; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(59,130,246,0.03) 40%, transparent 70%); pointer-events: none; z-index: 5;"></div>
-
-    <div id="ssr-fallback" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding-top: 64px; text-align: center; gap: 24px;">
-      <h1 style="font-family: 'Nunito', sans-serif; font-size: clamp(24px, 5vw, 40px); font-weight: 900; letter-spacing: 5px; margin: 0; color: #ffffff; text-shadow: 0 0 60px rgba(59,130,246,0.25), 0 2px 10px rgba(0,0,0,0.5);">
-        {copy.heroTitle}
+    <div id="ssr-fallback" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding-top: 64px; text-align: center; gap: 18px;">
+      <div style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #5b9fff; font-weight: 500; opacity: 0.85;">
+        {copy.heroEyebrow}
+      </div>
+      <h1 style="font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif; font-size: clamp(24px, 4vw, 40px); font-weight: 300; letter-spacing: -0.045em; line-height: 1.08; margin: 0; color: rgba(228,235,255,0.93);">
+        {copy.heroLineA}<br /><strong style="font-weight: 700;">{copy.heroLineB}</strong>
       </h1>
-      <p style="font-family: 'Inter', sans-serif; font-size: clamp(12px, 2vw, 14px); font-weight: 300; color: rgba(255,255,255,0.45); margin: 0; letter-spacing: 3px;">
-        {copy.heroSubtitle}
+      <p style="font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif; font-size: 12.5px; color: rgba(155,178,225,0.72); margin: 0; max-width: 300px; line-height: 1.65;">
+        {copy.heroLead}
       </p>
       <div id="ssr-fallback-spinner" style="margin-top: 32px;">
         <div style="width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.1); border-top-color: rgba(59,130,246,0.6); border-radius: 50%; animation: spin 1s linear infinite;"></div>
